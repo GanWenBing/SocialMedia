@@ -1,0 +1,148 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  iduser                                         Int            @id @default(autoincrement())
+  email                                          String         @db.VarChar(255)
+  username                                       String         @db.VarChar(255)
+  password                                       String         @db.VarChar(255)
+  coverPic                                       String?        @db.VarChar(255)
+  profilePic                                     String?        @db.VarChar(255)
+  Country                                        String?        @db.VarChar(255)
+  created_at                                     DateTime?      @default(now()) @db.Timestamp(0)
+  updated_at                                     DateTime?      @default(now()) @db.DateTime(0)
+  chatgroup                                      chatgroup[]
+  comment_comment_commentuseridTouser            comment[]      @relation("comment_commentuseridTouser")
+  friend_friend_friendzoneTouser                 friend[]       @relation("friend_friendzoneTouser")
+  like                                           like[]
+  post_post_receiverTouser                       post[]         @relation("post_receiverTouser")
+  post                                           post[]
+  posts                                          posts[]
+  relationship_relationship_followeduseridTouser relationship[] @relation("relationship_followeduseridTouser")
+  relationship_relationship_followeruseridTouser relationship[] @relation("relationship_followeruseridTouser")
+  room                                           room[]
+  stories                                        stories[]
+}
+
+model room {
+  idRoom                        Int       @id @default(autoincrement())
+  RoomName                      String    @db.VarChar(255)
+  createdby                     Int
+  created_at                    DateTime? @default(now()) @db.Timestamp(0)
+  updated_at                    DateTime? @default(now()) @db.DateTime(0)
+  friend_friend_grouproomTouser friend[]  @relation("friend_grouproomTouser")
+  user                          user      @relation(fields: [createdby], references: [iduser], onDelete: NoAction, onUpdate: NoAction, map: "creator")
+
+  @@index([createdby], map: "user_idx")
+}
+
+model post {
+  idPost                   Int       @id @default(autoincrement())
+  Message                  String    @db.VarChar(255)
+  sender                   Int
+  receiver                 Int
+  created_at               DateTime? @default(now()) @db.Timestamp(0)
+  updated_at               DateTime? @default(now()) @db.DateTime(0)
+  user_post_receiverTouser user      @relation("post_receiverTouser", fields: [receiver], references: [iduser], onDelete: NoAction, onUpdate: NoAction, map: "receiver_id")
+  user                     user      @relation(fields: [sender], references: [iduser], onDelete: NoAction, onUpdate: NoAction, map: "sender")
+
+  @@index([sender], map: "sender_idx")
+  @@index([receiver], map: "receiver_idx")
+}
+
+model friend {
+  idfriend                     Int         @id @default(autoincrement())
+  friendzone                   Int
+  grouproom                    Int
+  created_at                   DateTime?   @default(now()) @db.Timestamp(0)
+  updated_at                   DateTime?   @default(now()) @db.DateTime(0)
+  chatgroup                    chatgroup[]
+  user_friend_friendzoneTouser user        @relation("friend_friendzoneTouser", fields: [friendzone], references: [iduser], onDelete: NoAction, onUpdate: NoAction, map: "friend")
+  user_friend_grouproomTouser  room        @relation("friend_grouproomTouser", fields: [grouproom], references: [idRoom], onDelete: NoAction, onUpdate: NoAction, map: "group")
+
+  @@index([friendzone], map: "friend_idx")
+  @@index([grouproom], map: "group_idx")
+}
+
+model chatgroup {
+  idchatgroup Int    @id @default(autoincrement())
+  member      Int
+  post        String @db.VarChar(255)
+  created     Int
+  user        user   @relation(fields: [created], references: [iduser], onDelete: NoAction, onUpdate: NoAction, map: "creator1")
+  friend      friend @relation(fields: [member], references: [idfriend], onDelete: NoAction, onUpdate: NoAction, map: "user")
+
+  @@index([created], map: "creator_idx")
+  @@index([member], map: "user_idx")
+}
+
+model comment {
+  idcomment                        Int       @id @unique(map: "idcomment_UNIQUE") @default(autoincrement())
+  desc                             String    @db.VarChar(255)
+  commentuserid                    Int
+  commentpostid                    Int
+  created_at                       DateTime? @default(now()) @db.Timestamp(0)
+  updated_at                       DateTime? @default(now()) @db.DateTime(0)
+  user_comment_commentpostidTouser posts     @relation("comment_commentpostidTouser", fields: [commentpostid], references: [idPosts], onDelete: Cascade, map: "commentpostid")
+  user_comment_commentuseridTouser user      @relation("comment_commentuseridTouser", fields: [commentuserid], references: [iduser], onDelete: Cascade, map: "commentuserid")
+
+  @@index([commentpostid], map: "commentpostid_idx")
+  @@index([commentuserid], map: "commentuserid_idx")
+}
+
+model like {
+  idlike     Int       @id @unique(map: "idlike_UNIQUE") @default(autoincrement())
+  likeuserid Int
+  likepostid Int
+  created_at DateTime? @default(now()) @db.Timestamp(0)
+  updated_at DateTime? @default(now()) @db.DateTime(0)
+  posts      posts     @relation(fields: [likepostid], references: [idPosts], onDelete: Cascade, map: "likepostid")
+  user       user      @relation(fields: [likeuserid], references: [iduser], onDelete: Cascade, map: "likeuserid")
+
+  @@index([likepostid], map: "likepostid_idx")
+  @@index([likeuserid], map: "likeuseid_idx")
+}
+
+model posts {
+  idPosts                             Int       @id @unique(map: "idPosts_UNIQUE") @default(autoincrement())
+  desc                                String    @db.VarChar(255)
+  img                                 String?   @db.VarChar(255)
+  userid                              Int
+  created_at                          DateTime? @default(now()) @db.Timestamp(0)
+  updated_at                          DateTime? @default(now()) @db.DateTime(0)
+  comment_comment_commentpostidTouser comment[] @relation("comment_commentpostidTouser")
+  like                                like[]
+  user                                user      @relation(fields: [userid], references: [iduser], onDelete: Cascade, map: "userid")
+
+  @@index([userid], map: "userid_idx")
+}
+
+model relationship {
+  idrelationship                         Int       @id @unique(map: "idrelationship_UNIQUE") @default(autoincrement())
+  followeruserid                         Int
+  followeduserid                         Int
+  created_at                             DateTime? @default(now()) @db.Timestamp(0)
+  updated_at                             DateTime? @default(now()) @db.DateTime(0)
+  user_relationship_followeduseridTouser user      @relation("relationship_followeduseridTouser", fields: [followeduserid], references: [iduser], onDelete: Cascade, map: "followeduserid")
+  user_relationship_followeruseridTouser user      @relation("relationship_followeruseridTouser", fields: [followeruserid], references: [iduser], onDelete: Cascade, map: "followeruserid")
+
+  @@index([followeduserid], map: "followeduserid_idx")
+  @@index([followeruserid], map: "followeruserid_idx")
+}
+
+model stories {
+  idstories   Int       @id @unique(map: "idstories_UNIQUE") @default(autoincrement())
+  img         String    @db.VarChar(255)
+  storiesuser Int
+  created_at  DateTime? @default(now()) @db.Timestamp(0)
+  updated_at  DateTime? @default(now()) @db.DateTime(0)
+  user        user      @relation(fields: [storiesuser], references: [iduser], onDelete: Cascade, map: "storiesuserid")
+
+  @@index([storiesuser], map: "storiesuserid_idx")
+}
