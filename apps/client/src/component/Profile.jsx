@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/Auth";
 import { useContext } from "react";
 import { AiOutlineUpload } from "react-icons/ai";
+import { RiDatabase2Fill } from "react-icons/ri";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -16,8 +17,10 @@ const Profile = () => {
   const handleClick = () => {
     navigate("/Homepage");
   };
-
-  console.log(currentUser);
+  const [befetch, setBeFetch] = useState(true)
+  
+  console.log(fetch)
+  //console.log(currentUser);
   const [modal, setModal] = useState(false);
 
   const toggleModal = () => {
@@ -56,21 +59,26 @@ const Profile = () => {
       img: data1.file.name,
     };
     console.log(data);
-    // const person = JSON.parse(localStorage.getItem("userInfo"))
-    // console.log(person)
-
+    const data2 = {}
+    if(data.img == ""){
+      data2.desc = data1.desc
+    }else{
+      data2.desc = data1.desc
+      data2.img = data1.file.name
+    }
+    
     fetch(`api/createPosts/${currentUser.user.iduser}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify(data2),
     })
       .then((response) => {
         console.log(response);
         if (response.ok) {
           console.log("ok");
-          //window.location.reload("/Homepage");
+          window.location.reload("/profile");
         } else {
           console.log("Invalid, please try again");
         }
@@ -109,7 +117,7 @@ const Profile = () => {
             <div className="relative w-auto my-6 mx-auto max-w-3xl">
               <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
                 <div className="flex items-start justify-between p-5 border-b border-solid border-gray-300 rounded-t ">
-                  <h3 className="text-3xl font=semibold">General Info</h3>
+                  <h3 className="text-3xl font=semibold">Edit Profile</h3>
                   <button
                     className="bg-transparent border-0 text-black float-right"
                     onClick={() => setModal(false)}
@@ -120,23 +128,23 @@ const Profile = () => {
                   </button>
                 </div>
                 <div className="relative p-6 flex-auto">
-                  <form className="bg-gray-200 shadow-md rounded px-8 pt-6 pb-8 w-full">
-                    <label className="block text-black text-sm font-bold mb-1">
-                      First Name
+                  <form className="bg-gray-200 shadow-md rounded px-8 pt-6 pb-8 w-full" post="PUT" onSubmit={handleProfile}>
+                    {/* <label className="block text-black text-sm font-bold mb-1">
+                      Password
                     </label>
-                    <input className="shadow appearance-none border rounded w-full py-2 px-1 text-black" />
+                    <input type='password' className="shadow appearance-none border rounded w-full py-2 px-1 text-black" />
                     <label className="block text-black text-sm font-bold mb-1">
-                      Last Name
+                      Comfirm Password
                     </label>
-                    <input className="shadow appearance-none border rounded w-full py-2 px-1 text-black" />
+                    <input type='password' className="shadow appearance-none border rounded w-full py-2 px-1 text-black" /> */}
                     <label className="block text-black text-sm font-bold mb-1">
-                      Address
+                      Cover Picture
                     </label>
-                    <input className="shadow appearance-none border rounded w-full py-2 px-1 text-black" />
-                    <label className="block text-black text-sm font-bold mb-1">
+                    <input type='file' className="shadow appearance-none border rounded w-full py-2 px-1 text-black" />
+                    {/* <label className="block text-black text-sm font-bold mb-1">
                       City
                     </label>
-                    <input className="shadow appearance-none border rounded w-full py-2 px-1 text-black" />
+                    <input className="shadow appearance-none border rounded w-full py-2 px-1 text-black" /> */}
                   </form>
                 </div>
                 <div className="flex items-center justify-end p-6 border-t border-solid border-blueGray-200 rounded-b">
@@ -148,7 +156,7 @@ const Profile = () => {
                     Close
                   </button>
                   <button
-                    className="text-white bg-yellow-500 active:bg-yellow-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1"
+                    className="text-white bg-blue-500 active:bg-yellow-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1"
                     type="button"
                     onClick={() => setModal(false)}
                   >
@@ -203,7 +211,7 @@ const Profile = () => {
       </div>
 
       <div className="max-w-[25rem] sm:max-w-[33rem] mx-auto  sm:px-2 bg-white rounded-[1rem]">
-      <Selfpost />
+      <Selfpost befetch={befetch} setBeFetch={setBeFetch}/>
       </div>
 
     </div>

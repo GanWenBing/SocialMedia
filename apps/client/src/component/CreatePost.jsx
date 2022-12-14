@@ -9,6 +9,7 @@ const CreatePost = () => {
   const { currentUser } = useContext(AuthContext);
   const [coverpic, setCoverpic] = useState(currentUser.user.coverPic);
   const [file, setFile] = useState(null);
+  const [shouldFetch, setShouldFetch] = useState(true)
 
   const uploadFile = async () => {
     try {
@@ -18,7 +19,8 @@ const CreatePost = () => {
         method: "post",
         body: formData,
       })
-        .then((res) => res.text())
+        .then((res) => 
+        res.text())
         .then((data) => {
           console.log(data);
         });
@@ -37,21 +39,26 @@ const CreatePost = () => {
       img: data1.file.name,
     };
     console.log(data);
-    // const person = JSON.parse(localStorage.getItem("userInfo"))
-    // console.log(person)
+    const data2 = {}
+    if(data.img == ""){
+      data2.desc = data1.desc
+    }else{
+      data2.desc = data1.desc
+      data2.img = data1.file.name
+    }
 
     fetch(`api/createPosts/${currentUser.user.iduser}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify(data2),
     })
       .then((response) => {
         console.log(response);
         if (response.ok) {
           console.log("ok");
-          //window.location.reload("/Homepage");
+          window.location.reload("/Homepage");
         } else {
           console.log("Invalid, please try again");
         }
@@ -63,9 +70,9 @@ const CreatePost = () => {
   };
 
   return (
-    <div className="w-screen -ml-20 sm:w-full  ">
-      <div className="max-w-[25rem] sm:max-w-[33rem] mx-auto  sm:px-2 bg-white rounded-[1rem] ">
-        <div className=" mt-8 flex items-center w-full p-3 pt-4 ">
+    <div className="w-full relative -ml-20 sm:w-full  ">
+      <div className="max-w-[40rem] sm:max-w-[60rem] mx-auto  sm:px-2 bg-white rounded-[1rem] ">
+        <div className=" mt-4 flex items-center w-full p-3 pt-4 ">
           <div className="w-12 h-12 shrink-0">
             <img
               // src={session ? session?.user?.image : nouser.src}
@@ -93,7 +100,7 @@ const CreatePost = () => {
               className="hidden"
               onChange={(e) => setFile(e.target.files[0])}
             />
-            <button className="flex items-center bg-blue-500 px-8 rounded-full h-12 ml-6">
+            <button className="flex items-center bg-blue-500 px-8 rounded-full h-12 text-white ml-6 font-bold">
               Post
             </button>
           </form>

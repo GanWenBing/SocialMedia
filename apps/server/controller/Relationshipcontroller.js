@@ -47,9 +47,10 @@ const getAllfollowingPost = async(req, res) =>{
 }
 
 const AddFriend = async(req, res) =>{
+ 
   const { followeduserid} = req.body;
 
-  const followerid = [];
+    const followerid = [];
     const followedid = [];
     let index = 0;
     console.log('Hi')
@@ -81,7 +82,7 @@ const AddFriend = async(req, res) =>{
             index1++;
           }
         }
-        console.log(ArrFriend)
+        console.log("Arr",ArrFriend)
 
         const checkid = parseInt(followeduserid)
         console.log(checkid)
@@ -175,23 +176,24 @@ const showFriend = async(req, res) =>{
 }
 
 const deleteFriend = async(req, res) =>{
-  const {followeduserid } = req.body;
-  const Relationship = await prisma.relationship.findFirst(
-    {
-      where:{
-        followeruserid: parseInt(req.params.id)
-      }
-    }
-  )
-  console.log(Relationship)
-  if(!Relationship) return res.status(404).json({msg: "Something went wrong"});
+    console.log("delete")
   try{
-    await prisma.relationship.delete({
+    const Relationship = await prisma.relationship.findFirst({
       where:{
-        followeduserid: followeduserid
+        OR:[
+          {followeduserid: parseInt(req.params.id)},
+          {followeruserid: parseInt(req.params.id)}
+
+        ]
       }
     })
-    res.status(200).json({msg: "Friend Deleted"});
+    console.log(Relationship)
+    await prisma.relationship.delete({
+      where:{
+        idrelationship: Relationship.idrelationship
+      }
+    })
+    res.status(200).json("success");
   }catch(err){
     res.status(500).json(err)
   }

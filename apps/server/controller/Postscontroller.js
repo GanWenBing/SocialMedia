@@ -61,13 +61,13 @@ const createPosts = async (req, res) =>{
 
 const deletePosts = async (req, res) =>{
   console.log(req.params.id)
-  const Post = await prisma.posts.findFirst({
-      where: {
-          idPosts: parseInt(req.params.id)
+  // const Post = await prisma.posts.findFirst({
+  //     where: {
+  //         idPosts: parseInt(req.params.id)
 
-      }
-  });
-  if(!Post) return res.status(404).json({msg: "not under you"});
+  //     }
+  // });
+  // if(!Post) return res.status(404).json({msg: "not under you"});
   try {
       await prisma.posts.delete({
           where:{

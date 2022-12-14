@@ -36,7 +36,7 @@ const LeftSidebar = () => {
     fetch(`api/showFriend/${currentUser.user.iduser}`)
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
+        //console.log(data);
         setFriend(data);
       });
   }, []);
@@ -46,7 +46,7 @@ const LeftSidebar = () => {
   };
 
   return (
-    <div className="w-[15rem] hidden sm:block">
+    <div className="w-[20rem] hidden sm:block">
       <div className="flex flex-col  pt-4 sm:pt-10 pl-11">
         <div className="flex items-center font-bold">
           <RiProfileLine className="w-9 h-9" onClick={handleClick} />

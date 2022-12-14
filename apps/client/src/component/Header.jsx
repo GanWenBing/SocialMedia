@@ -22,7 +22,7 @@ const Header = () => {
   // const router = useRouter();
   // console.log(session);
   const { currentUser } = useContext(AuthContext);
-  console.log(currentUser);
+  //console.log(currentUser);
 
   const navigate = useNavigate();
   const [value, setValue] = useState("");
@@ -53,7 +53,7 @@ const Header = () => {
         return response.json();
       })
       .then((data) => {
-        console.log(data);
+        //console.log(data);
       });
     // window.localStorage.clear();
     // navigate('/')
@@ -64,7 +64,7 @@ const Header = () => {
       await fetch("/api/SearchAllUsers")
         .then((response) => response.json())
         .then((data) => {
-          console.log(data);
+          //console.log(data);
           setData(data);
         });
     };
@@ -73,7 +73,7 @@ const Header = () => {
 
   const handleClick = (searchTerm) => {
     setValue(searchTerm);
-    console.log({ value });
+    //console.log({ value });
   };
 
   const handleChange = (e) => {

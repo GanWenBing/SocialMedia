@@ -2,15 +2,14 @@ const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
 
 const getComment = async(req, res) =>{
-    const{desc,commentpostid} = req.body;
+    const{desc,commentuserid} = req.body;
     console.log(req.params.id)
     try{
     await prisma.comment.create({
         data:{
             desc: desc,
-          //   created_at: moment(Date.now()).format("YYY-MM-DD HH:mm:ss"),
-            commentuserid: parseInt(req.params.id),
-            commentpostid: commentpostid
+            commentuserid: commentuserid,
+            commentpostid: parseInt(req.params.id)
         }
     })
         res.status(200).json("comment is created")
@@ -19,8 +18,25 @@ const getComment = async(req, res) =>{
     }
 }
 
+const showCommentbypostid = async(req, res) =>{
+    try{
+        const Comment = await prisma.comment.findMany({
+            where:{
+                commentpostid: parseInt(req.params.id)
+            },include:{
+                user_comment_commentuseridTouser:true
+            }
+        })
+        res.status(200).json(Comment)
+    }catch(err){
+        res.status(500).json(err)
+    }
+    
+}
+
 
 module.exports={
-    getComment
+    getComment,
+    showCommentbypostid
     
 }

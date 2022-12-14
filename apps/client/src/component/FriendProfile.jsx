@@ -19,6 +19,7 @@ const FriendProfile = () => {
   };
 
   const [modal, setModal] = useState(false);
+  const [friendid, setFriendid] = useState()
 
   const toggleModal = () => {
     setModal(!modal);
@@ -45,14 +46,17 @@ const FriendProfile = () => {
              index++;
            }
            console.log(friendlist)
+           setFriendid(data[0].iduser)
 
            if(!friendlist.includes(data[0].iduser)){
             console.log("value is not inside")
             setModal(false)
-            addFriend(data[0].iduser)
+            // unFriend(data[0].iduser)
+            //addFriend(data[0].iduser)
            }else{
             console.log("value inside")
             setModal(true)
+            //unFriend(data[0].iduser)
            }
         });
       });
@@ -60,9 +64,10 @@ const FriendProfile = () => {
 
 
   const addFriend = (id) => {
+    console.log(id)
     const data = {
       followeruserid: currentUser.user.iduser,
-      followeduserid: id
+      followeduserid: id.friendid
     }
     console.log(data)
     // const person = JSON.parse(localStorage.getItem("userInfo"))
@@ -98,39 +103,29 @@ const FriendProfile = () => {
   //     });
   // }, []);
 
+  const unFriend = (id) =>{
+    
+    fetch(`api/deleteFriend/${id.friendid}`, {
+      method: "DELETE",
+      headers: {
+        'Content-Type': "application/json"
+      },
+    })
+    .then((response) => {
+      console.log(response);
+      if (response.ok) {
+        console.log("ok");
+        //window.location.reload("/Homepage");
+      } else {
+        console.log("Invalid, please try again");
+      }
+      return response.json();
+    })
+      .then((data) => {
+        console.log(data)
+      });
+  }
 
-
- 
-
-  const Addfriend = (event) => {
-    event.preventDefault();
-    console.log('Hi')
-    // const data = Object.fromEntries(new FormData(event.target));
-  
-    // // const person = JSON.parse(localStorage.getItem("userInfo"))
-    // // console.log(person)
-
-    // fetch(`api/createPosts/${currentUser.user.iduser}`, {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify(data),
-    // })
-    //   .then((response) => {
-    //     console.log(response);
-    //     if (response.ok) {
-    //       console.log("ok");
-    //       //window.location.reload("/Homepage");
-    //     } else {
-    //       console.log("Invalid, please try again");
-    //     }
-    //     return response.json();
-    //   })
-    //   .then((data) => {
-    //     console.log(data);
-    //   });
-  };
   
 
   return (
@@ -146,9 +141,10 @@ const FriendProfile = () => {
           </div>
         </div>
         <div>
-         {modal == false ? <AiOutlinePlusCircle className="w-8 h-8" onClick={()=>{toggleModal(); addFriend()}}/> : <AiOutlineMinusCircle className="w-8 h-8" onClick={toggleModal}/>}
+         {modal == false ? <AiOutlinePlusCircle className="w-8 h-8" onClick={()=>{toggleModal(); addFriend({friendid})}}/> : <AiOutlineMinusCircle className="w-8 h-8" onClick={()=>{toggleModal(); unFriend({friendid})}}/>}
         </div>
       </div>
+      <div>{friendid}</div>
 
       <div className=""></div>
       <Friendpost user={state} />

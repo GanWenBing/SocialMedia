@@ -11,41 +11,179 @@ import { useNavigate } from 'react-router-dom';
 import { useContext } from "react";
 import { AuthContext } from "../context/Auth";
 import { useMutation, useQueryClient} from '@tanstack/react-query'
+import Comment from "./Comment";
+
 
 const Friendpost = (props) => {
     console.log(props.user.name)
     const [post, setPost] = useState([]);
+    const { currentUser } = useContext(AuthContext)
     const [userid, setUserid] = useState()
+    const [modal, setModal] = useState(false)
+    const [numlike , setNumlike] = useState()
+    const [like, setLike] = useState([])
+    const [openComment, setOpenComment] = useState(false)
+    const [comment, setComment] = useState("")
+    const [befetch, setBeFetch] = useState(true)
 
     useEffect(() => {
+      if(befetch){
         fetch(`api/SearchFriendProfile/${props.user.name.value}`)
           .then((response) => response.json())
           .then((data) => {
             console.log(data);
             setUserid(data[0].iduser)
+            setBeFetch(false)
           });
-      }, []);
+      }
+      }, [befetch]);
 
       useEffect(() => {
+        if(befetch){
         fetch(`api/getAllpostsbyName/${props.user.name.value}`)
           .then((response) => response.json())
           .then((data) => {
             console.log(data);
             setPost(data)
+            setBeFetch(false)
           });
-      }, []);
+        }
+      }, [befetch]);
 
     const toggleModal = () =>{
+        setModal(!modal)
+    }
 
-    }
-    
-    const handleDelete = () =>{
+    useEffect(() => {
+      if(befetch){
+      fetch(`api/getLike`)
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data);
+          const counting = [];
+          let index1 = 0;
+          for(let j = 0; j < data.length; j++){
+            counting[index1] = data[j].likepostid
+            index1++;
+          }
+          console.log(counting)
+          setBeFetch(false)
+          setNumlike(counting)
+        });
+      }
+    }, [befetch]);
 
+    useEffect(() => {
+      if(befetch){
+      fetch(`api/getAllpostlike/${currentUser.user.iduser}`)
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data);
+          const postlike = [];
+          let index = 0;
+          for (let i = 0; i< data.length; i++){
+            postlike[index] = data[i].likepostid;
+            console.log(data[i].likepostid)
+            index++
+          }
+          setLike(postlike)
+          console.log(postlike)
+          setBeFetch(false)
+        });
+      }
+    }, [befetch]);
+
+    const likePost = (id) => {
+      console.log(id)
+      const data = {
+        likepostid: id
+      }
+      fetch(`api/pressLike/${currentUser.user.iduser}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      })
+        .then((response) => {
+          console.log(response);
+          if (response.ok) {
+            console.log("ok");
+            //window.location.reload("/Homepage");
+          } else {
+            console.log("Invalid, please try again");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          console.log(data);
+          setBeFetch(true)
+        });
+  
+    };
+
+    const unlikePost = (id) => {
+      console.log(id)
+      fetch(`api/removeLike/${id}/${currentUser.user.iduser}`, {
+        method: "DELETE",
+        headers: {
+          'Content-Type': "application/json"
+        },
+      })
+      .then((response) => {
+        console.log(response);
+        if (response.ok) {
+          console.log("ok");
+          //window.location.reload("/Homepage");
+        } else {
+          console.log("Invalid, please try again");
+        }
+        return response.json();
+      })
+        .then((data) => {
+          console.log(data)
+          setBeFetch(true)
+        });
+  
     }
-    
-    const likePost = () =>{
-        
+
+    const sendComment = async (id) => {
+      event.preventDefault();
+      console.log(id)
+      console.log(comment)
+      const data = {
+        desc: comment,
+        commentuserid: currentUser.user.iduser
+      }
+      console.log(data)
+      
+      fetch(`api/getcomment/${id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      })
+        .then((response) => {
+          console.log(response);
+          if (response.ok) {
+            console.log("ok");
+            //window.location.reload("/Homepage");
+          } else {
+            console.log("Invalid, please try again");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          console.log(data);
+        });
+    };
+
+    const sameElement = ( array, value ) =>{
+      return array.filter((v) => (v === value)).length
     }
+
+
   return (
     <div>
       <div className="w-screen sm:w-full">
@@ -79,7 +217,7 @@ const Friendpost = (props) => {
             <p>{post.desc}</p>
           </div>
           <div className="mx-2">
-            <img src={post.img !== null ? '../../public/'+post.img : null} />
+            <img src={post.img !== '' ? '../../public/'+post.img : null} />
           </div>
           <div className="flex justify-between text-[#8e8d8d] mt-3">
           <div className="flex items-center ">
@@ -87,50 +225,38 @@ const Friendpost = (props) => {
               <AiFillLike/>
             </div>
             <p className="pl-2 whitespace-nowrap  text-[15px] sm:text-[16px]">
-              {/* {` Emily Doe and another ${likes.length}`} */}how many likes
+             {sameElement(numlike,post.idPosts)} likes
             </p>
           </div>
         </div>
         <div className="border-b my-3"></div>
         <div className="flex justify-between mx-6">
-          <div className="flex items-center" onClick={likePost}>
-            <AiOutlineLike className="pl- w-8 h-8 text-[18px]">Like</AiOutlineLike>
-          </div>
+        {(!like.includes(post.idPosts)&&modal == false)? 
+          (<div className="flex items-center">
+            <AiOutlineLike className="pl-2 w-8 h-8 text-[18px]" onClick={()=>{likePost(post.idPosts)}}/>
+            <p className="pl-2 text-[18px]">Like</p>
+          </div>): 
+          (<div className="flex items-center" onClick={unlikePost}>
+            <AiOutlineLike className="pl-2 w-8 h-8 text-[18px] bg-blue-600" onClick={() => {unlikePost(post.idPosts)}}/>
+            <p className="pl-2 text-[18px] text-[#4a37f8]">Like</p>
+          </div>)
+          }
           <div className="flex items-center">
-            <FaRegCommentAlt className="w-5 h-5" />
+            <FaRegCommentAlt className="w-5 h-5" onClick={()=>setOpenComment(!openComment)} />
             <p className="pl-2 text-[18px]">Comment</p>
           </div>
           
         </div>
-        <div className="border-b my-2"></div>
-        <div className="max-h-60  overflow-y-auto  ">
-        </div>
-        {/* <div className="max-h-60  overflow-y-auto  ">
-        <div className="flex justify-between text-[#8e8d8d]  ">
-          <p>{`See ${comments.length} previous comments`}</p>
-          <div className="flex items-center">
-            <p>Most Relevant</p>
-            <RiArrowDownSLine />
+        <div className="border-b my-2">
+        <div className="flex items-center mt-3">
+          {
+              openComment &&  <Comment postId={post.idPosts}/> 
+            }
           </div>
         </div>
-        <div className=" ">
-          {comments.map((comment) => (
-            <div key={comment.id} className="">
-              <div className="flex items-center mt-3">
-                <div className="w-10 h-10">
-                  <img src={comment.data().image} className="rounded-full" />
-                </div>
-                <p className="ml-2 font-bold">{comment.data().username}</p>
-                <p className="ml-2 ">{comment.data().comment}</p>
-              </div>
-              <div className="ml-[3rem] flex -mt-1.5">
-                <p className="mr-2">Like </p>
-                <p>Reply </p>
-              </div>
-            </div>
-          ))}
+        <div className="max-h-60  overflow-y-auto  ">
         </div>
-      </div> */}
+        
         <div className="flex items-center mt-4">
         <div className=" w-10 h-10 shrink-0">
           <img
@@ -138,22 +264,18 @@ const Friendpost = (props) => {
             className="rounded-full "
           />
         </div>
-        <div className="w-full -ml-8 bg-[#f2f3f7] rounded-full flex items-center relative">
+        <div className="w-full -ml-8 bg-[#f2f3f7] rounded-full flex items-center relative" >
           <input
-            type="text"
+            type="desc"
             placeholder="Write a comment "
             className="outline-0  p-4 rounded-full w-full bg-[#f2f3f7]"
-            // onChange={(e) => setComment(e.target.value)}
+            name = "desc"
+            value = {comment}
+            onChange = {(e) =>setComment(e.target.value)}
           />
-          {/* <div className="flex absolute right-[4.5rem] space-x-2 text-[#8e8d8d]">
-            <BiSmile />
-            <AiOutlineCamera />
-            <AiOutlineGif />
-          </div> */}
-
           <div className="mr-4 bg-blue-400 text-white rounded-full">
-            <button className="font-bold  px-6 ">
-              Post
+            <button className="font-bold  px-6" onClick={()=>sendComment(post.idPosts)} >
+              post
             </button>
           </div>
         </div>
