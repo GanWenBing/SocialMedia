@@ -169,6 +169,31 @@ const updateUser = async(req, res) =>{
     }
 }
 
+const updatecoverpic = async(req, res) =>{
+    const user = await prisma.user.findFirst({
+        where: {
+            iduser: parseInt(req.params.id)
+        }
+    });
+    if(!user) return res.status(404).json({msg: "no users"});
+    if(!user) return res.status(404).json({msg: "no users"});
+    const {coverPic} = req.body;
+    try {
+        await prisma.user.update(
+        {
+            where:{
+                iduser: user.iduser
+            },
+            data:{
+            coverPic: coverPic
+        }});
+        res.status(200).json({msg: "User Updated"});
+    } catch (error) {
+        res.status(400).json({msg: error.message});
+    }
+
+}
+
 const Logout = async(req, res) => {
 
     //console.log(req,cookies.refreshToken)
@@ -225,5 +250,6 @@ module.exports = {
     updateUser,
     Logout,
     SearchAllUsers,
-    SearchFriendProfile
+    SearchFriendProfile,
+    updatecoverpic
 }

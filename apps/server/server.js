@@ -5,8 +5,9 @@ const prisma = new PrismaClient()
 const app = express();
 const cookieParser = require("cookie-parser")
 const cors = require('cors');
-const multer = require('multer')
-const PORT = process.env.PORT || 3000
+const multer = require('multer');
+const path = require('path')
+const PORT = process.env.PORT || 3005
 
 const userRouter = require('./routes/user')
 // const roomRouter = require('./routes/room')
@@ -51,6 +52,16 @@ app.use("/api", postsRouter)
 app.use("/api", relationshipRouter)
 app.use("/api", commentRouter)
 app.use("/api", likeRouter)
+
+app.get("/test", (req, res) => {
+  res.send("Hello World!");
+});
+
+app.use(express.static("../client/dist"));
+
+app.get("/*", (req, res) => {
+  res.sendFile(path.resolve("../client/dist/index.html"));
+});
 
 app.listen(PORT, () => {
     console.log(`Example app listening on port ${PORT}`);

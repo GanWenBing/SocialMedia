@@ -1,10 +1,12 @@
 generator client {
   provider = "prisma-client-js"
+  
 }
 
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
 model user {
@@ -17,70 +19,70 @@ model user {
   Country                                        String?        @db.VarChar(255)
   created_at                                     DateTime?      @default(now()) @db.Timestamp(0)
   updated_at                                     DateTime?      @default(now()) @db.DateTime(0)
-  chatgroup                                      chatgroup[]
+  // chatgroup                                      chatgroup[]
   comment_comment_commentuseridTouser            comment[]      @relation("comment_commentuseridTouser")
-  friend_friend_friendzoneTouser                 friend[]       @relation("friend_friendzoneTouser")
+  // friend_friend_friendzoneTouser                 friend[]       @relation("friend_friendzoneTouser")
   like                                           like[]
-  post_post_receiverTouser                       post[]         @relation("post_receiverTouser")
-  post                                           post[]
+  // post_post_receiverTouser                       post[]         @relation("post_receiverTouser")
+  // post                                           post[]
   posts                                          posts[]
   relationship_relationship_followeduseridTouser relationship[] @relation("relationship_followeduseridTouser")
   relationship_relationship_followeruseridTouser relationship[] @relation("relationship_followeruseridTouser")
-  room                                           room[]
-  stories                                        stories[]
+  // room                                           room[]
+  // stories                                        stories[]
 }
 
-model room {
-  idRoom                        Int       @id @default(autoincrement())
-  RoomName                      String    @db.VarChar(255)
-  createdby                     Int
-  created_at                    DateTime? @default(now()) @db.Timestamp(0)
-  updated_at                    DateTime? @default(now()) @db.DateTime(0)
-  friend_friend_grouproomTouser friend[]  @relation("friend_grouproomTouser")
-  user                          user      @relation(fields: [createdby], references: [iduser], onDelete: NoAction, onUpdate: NoAction, map: "creator")
+// model room {
+//   idRoom                        Int       @id @default(autoincrement())
+//   RoomName                      String    @db.VarChar(255)
+//   createdby                     Int
+//   created_at                    DateTime? @default(now()) @db.Timestamp(0)
+//   updated_at                    DateTime? @default(now()) @db.DateTime(0)
+//   friend_friend_grouproomTouser friend[]  @relation("friend_grouproomTouser")
+//   user                          user      @relation(fields: [createdby], references: [iduser], onDelete: NoAction, onUpdate: NoAction, map: "creator")
 
-  @@index([createdby], map: "user_idx")
-}
+//   @@index([createdby], map: "user_idx")
+// }
 
-model post {
-  idPost                   Int       @id @default(autoincrement())
-  Message                  String    @db.VarChar(255)
-  sender                   Int
-  receiver                 Int
-  created_at               DateTime? @default(now()) @db.Timestamp(0)
-  updated_at               DateTime? @default(now()) @db.DateTime(0)
-  user_post_receiverTouser user      @relation("post_receiverTouser", fields: [receiver], references: [iduser], onDelete: NoAction, onUpdate: NoAction, map: "receiver_id")
-  user                     user      @relation(fields: [sender], references: [iduser], onDelete: NoAction, onUpdate: NoAction, map: "sender")
+// model post {
+//   idPost                   Int       @id @default(autoincrement())
+//   Message                  String    @db.VarChar(255)
+//   sender                   Int
+//   receiver                 Int
+//   created_at               DateTime? @default(now()) @db.Timestamp(0)
+//   updated_at               DateTime? @default(now()) @db.DateTime(0)
+//   user_post_receiverTouser user      @relation("post_receiverTouser", fields: [receiver], references: [iduser], onDelete: NoAction, onUpdate: NoAction, map: "receiver_id")
+//   user                     user      @relation(fields: [sender], references: [iduser], onDelete: NoAction, onUpdate: NoAction, map: "sender")
 
-  @@index([sender], map: "sender_idx")
-  @@index([receiver], map: "receiver_idx")
-}
+//   @@index([sender], map: "sender_idx")
+//   @@index([receiver], map: "receiver_idx")
+// }
 
-model friend {
-  idfriend                     Int         @id @default(autoincrement())
-  friendzone                   Int
-  grouproom                    Int
-  created_at                   DateTime?   @default(now()) @db.Timestamp(0)
-  updated_at                   DateTime?   @default(now()) @db.DateTime(0)
-  chatgroup                    chatgroup[]
-  user_friend_friendzoneTouser user        @relation("friend_friendzoneTouser", fields: [friendzone], references: [iduser], onDelete: NoAction, onUpdate: NoAction, map: "friend")
-  user_friend_grouproomTouser  room        @relation("friend_grouproomTouser", fields: [grouproom], references: [idRoom], onDelete: NoAction, onUpdate: NoAction, map: "group")
+// model friend {
+//   idfriend                     Int         @id @default(autoincrement())
+//   friendzone                   Int
+//   grouproom                    Int
+//   created_at                   DateTime?   @default(now()) @db.Timestamp(0)
+//   updated_at                   DateTime?   @default(now()) @db.DateTime(0)
+//   chatgroup                    chatgroup[]
+//   user_friend_friendzoneTouser user        @relation("friend_friendzoneTouser", fields: [friendzone], references: [iduser], onDelete: NoAction, onUpdate: NoAction, map: "friend")
+//   user_friend_grouproomTouser  room        @relation("friend_grouproomTouser", fields: [grouproom], references: [idRoom], onDelete: NoAction, onUpdate: NoAction, map: "group")
 
-  @@index([friendzone], map: "friend_idx")
-  @@index([grouproom], map: "group_idx")
-}
+//   @@index([friendzone], map: "friend_idx")
+//   @@index([grouproom], map: "group_idx")
+// }
 
-model chatgroup {
-  idchatgroup Int    @id @default(autoincrement())
-  member      Int
-  post        String @db.VarChar(255)
-  created     Int
-  user        user   @relation(fields: [created], references: [iduser], onDelete: NoAction, onUpdate: NoAction, map: "creator1")
-  friend      friend @relation(fields: [member], references: [idfriend], onDelete: NoAction, onUpdate: NoAction, map: "user")
+// model chatgroup {
+//   idchatgroup Int    @id @default(autoincrement())
+//   member      Int
+//   post        String @db.VarChar(255)
+//   created     Int
+//   user        user   @relation(fields: [created], references: [iduser], onDelete: NoAction, onUpdate: NoAction, map: "creator1")
+//   friend      friend @relation(fields: [member], references: [idfriend], onDelete: NoAction, onUpdate: NoAction, map: "user")
 
-  @@index([created], map: "creator_idx")
-  @@index([member], map: "user_idx")
-}
+//   @@index([created], map: "creator_idx")
+//   @@index([member], map: "user_idx")
+// }
 
 model comment {
   idcomment                        Int       @id @unique(map: "idcomment_UNIQUE") @default(autoincrement())
@@ -136,13 +138,13 @@ model relationship {
   @@index([followeruserid], map: "followeruserid_idx")
 }
 
-model stories {
-  idstories   Int       @id @unique(map: "idstories_UNIQUE") @default(autoincrement())
-  img         String    @db.VarChar(255)
-  storiesuser Int
-  created_at  DateTime? @default(now()) @db.Timestamp(0)
-  updated_at  DateTime? @default(now()) @db.DateTime(0)
-  user        user      @relation(fields: [storiesuser], references: [iduser], onDelete: Cascade, map: "storiesuserid")
+// model stories {
+//   idstories   Int       @id @unique(map: "idstories_UNIQUE") @default(autoincrement())
+//   img         String    @db.VarChar(255)
+//   storiesuser Int
+//   created_at  DateTime? @default(now()) @db.Timestamp(0)
+//   updated_at  DateTime? @default(now()) @db.DateTime(0)
+//   user        user      @relation(fields: [storiesuser], references: [iduser], onDelete: Cascade, map: "storiesuserid")
 
-  @@index([storiesuser], map: "storiesuserid_idx")
-}
+//   @@index([storiesuser], map: "storiesuserid_idx")
+// }

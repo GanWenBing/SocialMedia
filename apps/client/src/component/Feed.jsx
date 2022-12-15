@@ -5,14 +5,13 @@ import Posts from "./Posts";
 import { useState } from "react";
 
 const Feed = () => {
-  const [fetch, setFetch] = useState(true)
 
   return (
     <div className="flex bg-[#f2f3f7] ">
       <LeftSidebar />
-      <div className="mx-auto">
+      <div className="">
         <CreatePost />
-        <Posts fetch={fetch} setFetch={setFetch}/>
+        <Posts/>
       </div>
     </div>
   );

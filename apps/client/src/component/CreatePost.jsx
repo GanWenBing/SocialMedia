@@ -71,7 +71,7 @@ const CreatePost = () => {
 
   return (
     <div className="w-full relative -ml-20 sm:w-full  ">
-      <div className="max-w-[40rem] sm:max-w-[60rem] mx-auto  sm:px-2 bg-white rounded-[1rem] ">
+      <div className="max-w-[100rem] sm:max-w-[60rem] mx-auto  sm:px-2 bg-white rounded-[1rem] ">
         <div className=" mt-4 flex items-center w-full p-3 pt-4 ">
           <div className="w-12 h-12 shrink-0">
             <img

@@ -90,6 +90,9 @@ const Profile = () => {
   };
 
 
+  
+
+
   return (
     <div className="w-screen sm:w-full bg-blue-300">
       <MdHome className="w-9 h-9" onClick={handleClick} />

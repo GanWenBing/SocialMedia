@@ -13,9 +13,9 @@ import { AuthContext } from "../context/Auth";
 import { useMutation, useQueryClient} from '@tanstack/react-query'
 import Comment from "./Comment";
 
-const Post = (props) => {
-  console.log(props)
-  const queryClient = useQueryClient()
+const Post = ({befetch, setBeFetch}) => {
+  console.log(befetch)
+  //const queryClient = useQueryClient()
   const { currentUser } = useContext(AuthContext)
   const [post, setPost] = useState([]);
   const [like, setLike] = useState([])
@@ -31,26 +31,27 @@ const Post = (props) => {
   const toggleModal = () =>{
     setModal(!modal)
   }
-
+  
+  console.log(currentUser.user.iduser)
 
   useEffect(() => {
-    if(props.fetch){
+    if(befetch){
     fetch(`api/getAllfollowingPost/${currentUser.user.iduser}`)
       .then((response) => response.json())
       .then((data) => {
-        //console.log(data);
+        console.log(data);
         setPost(data.reverse());
-        props.setFetch(false)
+        //setBeFetch(false)
       });
     }
-  }, [props.fetch]);
+  }, [befetch]);
 
   useEffect(() => { // get all like
-  if(props.fetch){
+  if(befetch){
     fetch(`api/getLike`)
       .then((response) => response.json())
       .then((data) => {
-        //console.log(data);
+        console.log(data);
         const counting = [];
         let index1 = 0;
         for(let j = 0; j < data.length; j++){
@@ -59,13 +60,13 @@ const Post = (props) => {
         }
         console.log(counting)
         setNumlike(counting)
-        props.setFetch(false)
+        //setBeFetch(false)
       });
     }
-  }, [props.fetch]);
+  }, [befetch]);
 
   useEffect(() => {
-    if(props.fetch){
+    if(befetch){
     fetch(`api/getAllpostlike/${currentUser.user.iduser}`) //login user like the post
       .then((response) => response.json())
       .then((data) => {
@@ -78,11 +79,11 @@ const Post = (props) => {
           index++
         }
         setLike(postlike)
-        props.setFetch(false)
+        //setBeFetch(false)
         //console.log(postlike)
       });
     }
-  }, [props.fetch]);
+  }, [befetch]);
 
 
   const likePost = (id) => {
@@ -109,7 +110,7 @@ const Post = (props) => {
       })
       .then((data) => {
         console.log(data);
-        props.setFetch(true)
+        setBeFetch(true)
       });
     
   };
@@ -134,7 +135,7 @@ const Post = (props) => {
     })
       .then((data) => {
         console.log(data)
-        props.setFetch(true)
+        setBeFetch(true)
       });
   }
 
@@ -170,7 +171,7 @@ const Post = (props) => {
         return response.json();
       })
       .then((data) => {
-        props.setFetch(true)
+        setBeFetch(true)
         //console.log(data);
       });
   };

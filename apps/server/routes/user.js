@@ -24,4 +24,6 @@ router.get('/SearchAllUsers', usercontroller.SearchAllUsers)
 
 router.get('/SearchFriendProfile/:id', usercontroller.SearchFriendProfile)
 
+router.put('/updatecoverpic/:id', usercontroller.updatecoverpic)
+
 module.exports = router

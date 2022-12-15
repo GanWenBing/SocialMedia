@@ -46,11 +46,11 @@ const CreateAccount = () => {
                 return response.json()
             })
             .then((data) => {
-                console.log(data2)
-                setError(data2.error)
+                console.log(data)
+                setError(data.error)
             });
         }else{
-            setError("something wrong")
+            setError(data)
         }
 
     }
